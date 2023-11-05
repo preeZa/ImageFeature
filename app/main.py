@@ -1,21 +1,19 @@
-from fastapi import FastAPI , Request
-import cv2
+from fastapi import FastAPI , Request 
 import numpy as np
+from fastai.vision.all import PILImage
 import base64
-from app.hog import gethog
 
 app = FastAPI()
 
 def read64(uri):
     encoded_data = uri.split(',')[1]
-    nparr = np.fromstring(base64.b64decode(encoded_data), np.uint8)
-    img = cv2.imdecode(nparr, cv2.IMREAD_GRAYSCALE)
+    img = PILImage.create(base64.b64decode(encoded_data))
     return img
 
 @app.get("/api/gethog")
 async def read_str(request : Request):
     item = await request.json()
     item_str = item['img']
-    img = read64(item_str)
-    hog = gethog(img)
-    return {"hog":hog.tolist()}
+    result=read64(item_str)
+    return {"result":result}
+
